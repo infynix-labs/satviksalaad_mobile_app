@@ -527,6 +527,27 @@ export interface DailyMenuResponse {
   };
 }
 
+export interface MenuWeek {
+  /** Week 1 is the first week with a Monday-to-Saturday date in the month, as on the printed menu. */
+  number: number;
+  days: DayMenu[];
+}
+
+export interface MenuMonth {
+  /** YYYY-MM. */
+  month: string;
+  /** "November". */
+  name: string;
+  note: string | null;
+  weeks: MenuWeek[];
+}
+
+export interface MonthlyMenuResponse {
+  success: boolean;
+  /** The current month, then next month once it is published. */
+  data: { months: MenuMonth[] };
+}
+
 // ─── Videos ───────────────────────────────────────────────────────────────────
 export type VideoCategoryId = 'yoga' | 'fitness' | 'nutrition' | 'wellness';
 

@@ -6,6 +6,7 @@ import type {
   CreateOrderResponse,
   CreateRazorpayOrderResponse,
   DailyMenuResponse,
+  MonthlyMenuResponse,
   DietaryOptionsResponse,
   DeliveriesActionResponse,
   DeliveriesInitResponse,
@@ -301,6 +302,8 @@ export const menuApi = {
   get: () => apiFetch<MenuResponse>('/api/v1/menu'),
   /** Today's salad, soup and juice, and the week ahead. */
   daily: () => apiFetch<DailyMenuResponse>('/api/v1/daily-menu'),
+  /** This month's menu by week, and next month's once it is published. */
+  monthly: () => apiFetch<MonthlyMenuResponse>('/api/v1/monthly-menu'),
 };
 
 // ─── Videos ───────────────────────────────────────────────────────────────────

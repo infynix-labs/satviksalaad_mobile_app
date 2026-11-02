@@ -11,9 +11,12 @@ import { DietBadges } from './diet-badges';
 
 export const PHOTO_COMING_SOON = 'Photo coming soon. Our team is working on it.';
 
+const THUMB = 88;
+
 interface MealCardProps {
   meal: {
     name: string;
+    description?: string | null;
     kcal: number | null;
     protein: number | null;
     imageUrl: string | null;
@@ -26,7 +29,7 @@ interface MealCardProps {
   onPress: () => void;
 }
 
-/** One menu item as a small grid card: photo, name, nutrition and diet marks. */
+/** One menu item as a row: name, description, nutrition and diet marks, with a small photo on the right only when there is one. */
 export function MealCard({ meal, width, showCalories = true, showProtein = true, onPress }: MealCardProps) {
   const { colors, fonts } = useTheme();
   const photo = optimizedImageSource(meal.imageUrl);
@@ -43,8 +46,24 @@ export function MealCard({ meal, width, showCalories = true, showProtein = true,
       accessibilityRole="button"
       accessibilityLabel={meal.name}
     >
-      <View style={[s.photo, { backgroundColor: Brand.sageLight }]}>
-        {photo ? (
+      <View style={s.body}>
+        <Text style={[s.name, { color: colors.text, fontFamily: fonts.bodySemibold }]} numberOfLines={2}>
+          {meal.name}
+        </Text>
+        {meal.description ? (
+          <Text style={[s.description, { color: colors.textSecondary, fontFamily: fonts.body }]} numberOfLines={2}>
+            {meal.description}
+          </Text>
+        ) : null}
+        {facts.length > 0 ? (
+          <Text style={[s.facts, { color: colors.primary, fontFamily: fonts.bodyMedium }]} numberOfLines={1}>
+            {facts.join(' · ')}
+          </Text>
+        ) : null}
+        <DietBadges labels={meal.dietLabels} />
+      </View>
+      {photo ? (
+        <View style={[s.photo, { backgroundColor: Brand.sageLight }]}>
           <Image
             source={photo}
             style={StyleSheet.absoluteFill}
@@ -53,42 +72,24 @@ export function MealCard({ meal, width, showCalories = true, showProtein = true,
             transition={200}
             recyclingKey={meal.imageUrl ?? undefined}
           />
-        ) : (
-          <>
-            <Image source={require('@/assets/images/hero-image.png')} style={StyleSheet.absoluteFill} contentFit="cover" />
-            <Text style={[s.photoNote, { fontFamily: fonts.body }]}>Photo coming soon</Text>
-          </>
-        )}
-      </View>
-      <View style={s.body}>
-        <Text style={[s.name, { color: colors.text, fontFamily: fonts.bodySemibold }]} numberOfLines={2}>
-          {meal.name}
-        </Text>
-        {facts.length > 0 ? (
-          <Text style={[s.facts, { color: colors.primary, fontFamily: fonts.bodyMedium }]} numberOfLines={1}>
-            {facts.join(' · ')}
-          </Text>
-        ) : null}
-        <DietBadges labels={meal.dietLabels} />
-      </View>
+        </View>
+      ) : null}
     </TouchableOpacity>
   );
 }
 
 const s = StyleSheet.create({
-  card: { borderRadius: Radius.lg, overflow: 'hidden' },
-  photo: { width: '100%', aspectRatio: 4 / 3 },
-  photoNote: {
-    position: 'absolute',
-    bottom: 6,
-    left: 0,
-    right: 0,
-    textAlign: 'center',
-    fontSize: 10,
-    color: Brand.forest,
-    opacity: 0.7,
+  card: {
+    borderRadius: Radius.lg,
+    overflow: 'hidden',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing[3],
+    padding: Spacing[3],
   },
-  body: { padding: Spacing[2.5], gap: 4 },
-  name: { fontSize: FontSize.sm, lineHeight: FontSize.sm * 1.3 },
-  facts: { fontSize: FontSize.xs },
+  photo: { width: THUMB, height: THUMB, borderRadius: Radius.md, overflow: 'hidden' },
+  body: { flex: 1, gap: 4 },
+  name: { fontSize: FontSize.base, lineHeight: FontSize.base * 1.3 },
+  description: { fontSize: FontSize.sm, lineHeight: FontSize.sm * 1.35 },
+  facts: { fontSize: FontSize.xs, marginTop: 2 },
 });

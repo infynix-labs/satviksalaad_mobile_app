@@ -384,7 +384,7 @@ export default function HomeScreen() {
             />
           </View>
 
-          <TodayMenu onSeeMenu={() => router.navigate("/(tabs)/menu")} />
+          <TodayMenu onSeeMenu={() => router.navigate({ pathname: "/(tabs)/menu", params: { view: "daily" } })} />
 
           {(showSkeleton || recentLogs.length > 0) && (
             <RecentActivity
