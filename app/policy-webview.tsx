@@ -21,6 +21,10 @@ function isSiteUrl(url: string): boolean {
   return host !== undefined && SITE_HOSTS.includes(host.toLowerCase());
 }
 
+function pagePath(url: string): string {
+  return (/^https:\/\/[^/?#]+([^?#]*)/i.exec(url)?.[1] ?? '').replace(/\/+$/, '');
+}
+
 export default function PolicyWebViewScreen() {
   const rawParams = useLocalSearchParams<{ url: string | string[]; title: string | string[] }>();
   const requestedUrl = Array.isArray(rawParams.url) ? rawParams.url[0] : rawParams.url;
@@ -43,24 +47,23 @@ export default function PolicyWebViewScreen() {
     }
   };
 
-  // Inject CSS to make the page mobile-responsive and match app style. A page with
-  // its own viewport is already built for phones, and the image rule would shrink its logo.
-  const INJECTED_CSS = `
+  // The site's header and footer lead to plans and checkout, and its links move
+  // between pages without a page load, which onShouldStartLoadWithRequest never sees.
+  // So the page stands alone here and every link off it goes to the app instead.
+  const STANDALONE_PAGE = `
     (function() {
-      if (document.querySelector('meta[name="viewport"]')) return;
-      var meta = document.createElement('meta');
-      meta.name = 'viewport';
-      meta.content = 'width=device-width, initial-scale=1, maximum-scale=1';
-      document.head.appendChild(meta);
-
       var style = document.createElement('style');
-      style.textContent = \`
-        * { box-sizing: border-box !important; }
-        body { max-width: 100vw !important; overflow-x: hidden !important; word-break: break-word !important; }
-        img, video, iframe, table { max-width: 100% !important; height: auto !important; }
-        pre, code { white-space: pre-wrap !important; word-break: break-all !important; }
-      \`;
+      style.textContent = 'body header, body footer { display: none !important; }';
       document.head.appendChild(style);
+      document.addEventListener('click', function (e) {
+        var link = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+        if (!link) return;
+        var to = new URL(link.href, location.href);
+        if (to.origin === location.origin && to.pathname === location.pathname) return;
+        e.preventDefault();
+        e.stopPropagation();
+        window.ReactNativeWebView.postMessage(to.href);
+      }, true);
     })();
     true;
   `;
@@ -86,13 +89,17 @@ export default function PolicyWebViewScreen() {
         ref={webViewRef}
         source={{ uri: url }}
         style={[styles.webview, { backgroundColor: colors.background }]}
-        injectedJavaScript={INJECTED_CSS}
+        injectedJavaScript={STANDALONE_PAGE}
+        onMessage={({ nativeEvent }) => {
+          if (/^(https?|mailto|tel|whatsapp):/i.test(nativeEvent.data)) Linking.openURL(nativeEvent.data).catch(() => {});
+        }}
         onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
         onLoadStart={() => setLoading(true)}
         onLoadEnd={() => setLoading(false)}
         onNavigationStateChange={(state) => setCanGoBack(state.canGoBack)}
         onShouldStartLoadWithRequest={(req) => {
-          if (req.isTopFrame === false || isSiteUrl(req.url)) return true;
+          if (req.isTopFrame === false) return true;
+          if (isSiteUrl(req.url) && pagePath(req.url) === pagePath(url)) return true;
           Linking.openURL(req.url).catch(() => {});
           return false;
         }}

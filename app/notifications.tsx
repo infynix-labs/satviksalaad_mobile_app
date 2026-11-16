@@ -24,6 +24,7 @@ import { useQueryFocusRefetch } from '@/hooks/useQueryFocusRefetch';
 import { useTheme } from '@/hooks/use-theme';
 import { notificationsApi } from '@/lib/api';
 import { CACHE_TTL } from '@/lib/query-client';
+import { useWhatsAppOrdering } from '@/lib/whatsapp-ordering';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -274,6 +275,8 @@ export default function NotificationsScreen() {
     [handleMarkRead],
   );
 
+  const whatsappOrdering = useWhatsAppOrdering();
+  const filters = whatsappOrdering ? FILTERS.filter((f) => f !== 'Payments') : FILTERS;
   const typeFilter = filterToType(activeFilter);
   const filtered = typeFilter
     ? notifications.filter((n) => n.type === typeFilter)
@@ -311,7 +314,7 @@ export default function NotificationsScreen() {
         contentContainerStyle={[styles.filtersContent, { paddingHorizontal: Spacing[5] }]}
         style={[styles.filtersScroll, column()]}
       >
-        {FILTERS.map((f) => {
+        {filters.map((f) => {
           const isActive = f === activeFilter;
           return (
             <TouchableOpacity

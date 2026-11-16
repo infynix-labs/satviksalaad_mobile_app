@@ -164,7 +164,6 @@ function UploadedPlayer({ uri, portrait }: { uri: string; portrait: boolean }) {
         nativeControls
         contentFit="contain"
         fullscreenOptions={{ enable: true }}
-        allowsPictureInPicture
       />
     </View>
   );

@@ -137,13 +137,15 @@
         {
           "locationWhenInUsePermission": "Satvik Salaad uses your location to fill in your delivery address and to help the delivery partner find you.",
           "locationAlwaysAndWhenInUsePermission": false,
-          "locationAlwaysPermission": false
+          "locationAlwaysPermission": false,
+          "motionUsagePermission": false,
+          "locationFullAccuracyPermission": false
         }
       ],
       [
         "expo-video",
         {
-          "supportsPictureInPicture": true,
+          "supportsPictureInPicture": false,
           "supportsBackgroundPlayback": false
         }
       ],

@@ -9,8 +9,6 @@ import { optimizedImageSource } from '@/lib/image-url';
 
 import { DietBadges } from './diet-badges';
 
-export const PHOTO_COMING_SOON = 'Photo coming soon. Our team is working on it.';
-
 const THUMB = 88;
 
 interface MealCardProps {

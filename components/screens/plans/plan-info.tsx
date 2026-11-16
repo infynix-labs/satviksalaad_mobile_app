@@ -49,7 +49,7 @@ function questions(plans: Plan[], gstRateBps: number, showPayment: boolean): { q
   return [
     {
       q: 'Does my plan renew automatically?',
-      a: "No. You pay once for the plan you choose and nothing renews by itself. Buy again whenever you're ready.",
+      a: "No. A plan covers the bowls you chose and nothing renews by itself. Choose a new plan whenever you're ready.",
     },
     ...(showPayment
       ? [
@@ -83,10 +83,14 @@ function questions(plans: Plan[], gstRateBps: number, showPayment: boolean): { q
       q: 'Where do you deliver, and what does it cost?',
       a: `Across Ahmedabad. ${DELIVERY_CHARGES} The areas we cover are listed below.`,
     },
-    {
-      q: 'Can I get a refund?',
-      a: "Before your first delivery, yes: contact us and we'll refund what you paid. Once deliveries start, plans aren't refundable unless the problem is on our side. If a bowl arrives damaged or wrong, message us the same day with a photo and we'll make it right.",
-    },
+    ...(showPayment
+      ? [
+          {
+            q: 'Can I get a refund?',
+            a: "Before your first delivery, yes: contact us and we'll refund what you paid. Once deliveries start, plans aren't refundable unless the problem is on our side. If a bowl arrives damaged or wrong, message us the same day with a photo and we'll make it right.",
+          },
+        ]
+      : []),
   ];
 }
 

@@ -183,7 +183,7 @@ export default function InvoicesScreen() {
               <EmptyState
                 icon="receipt-outline"
                 title="No invoices yet"
-                body="Invoices are generated automatically after every payment."
+                body="Invoices for your orders appear here."
               />
             ) : (
               <View style={[styles.listCard, { backgroundColor: colors.surface, borderWidth: 0 }, CardEdge]}>
